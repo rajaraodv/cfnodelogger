@@ -1,0 +1,176 @@
+<!doctype html>
+<html ng-app="project">
+
+<head>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet" href="css/mycss.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js"></script>
+    <script src="lib/headerCtrl.js"></script>
+    <script src="lib/logsCtrl.js"></script>
+    <script>
+        !function ($) {
+            $(function(){
+                // carousel demo
+                $('#myCarousel').carousel()
+            })
+        }(window.jQuery)
+    </script>
+</head>
+
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="#">CFNodeLogger</a>
+
+            <div class="nav-collapse collapse" ng-controller="HeaderCtrl">
+               <ul ng-show="loggedIn" class='nav'>
+                   <li class="dropdown">
+                       <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{showingLogsFor}} <b class="caret"></b></a>
+                       <ul class="dropdown-menu">
+                           <li ng-repeat='app in apps'><a href="javascript:void(0)" ng-click="showLogsApp(app)">{{app.name}}</a></li>
+
+                       </ul>
+                   </li>
+               </ul>
+
+                <ul class="nav pull-right">
+                    <li>
+                        <form ng-hide="loggedIn" class="navbar-form">
+                            <a class="btn btn-warning" href='/auth/cloudfoundry'>Sign in with Cloud Foundry</a>
+                        </form>
+                    </li>
+                    <li class="divider" ng-show="loggedIn">
+                    </li>
+                    <li>
+                        <a  ng-show="loggedIn">{{loginText}}</a>
+                    </li>
+                    <li>
+                        <a  ng-show="loggedIn" href="/logout">Log Out</a>
+                    </li>
+                    <ul ng-show="loggedIn" class='nav'>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Settings <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a ng-click='toggleLN()' href="javascript:void(0)"><i class='icon-tasks'></i>Toggle Line Numbers</a></li>
+
+                            </ul>
+                        </li>
+                    </ul>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<div ng-show="loggedIn"  id="cfLogs" ng-controller='LogsCtrl' class="container">
+    <div class='well' ng-repeat='log in logs'>
+        <div class="alert alert-info" tabindex="1">
+
+
+            <strong>Instance:</strong> {{log.instance}} <strong>Log type: </strong> {{log.fName}} &nbsp;
+            <a class='btn btn-mini' ng-click='clear(log)'><i class="icon-remove"></i>&nbsp;Clear Logs</a>
+            <a>&nbsp;</a>
+            <a class='btn btn-mini' ng-show='log.logsCleared' ng-click='showAll(log)'><i class="icon-refresh"></i>&nbsp;Show all</a>
+            <a>&nbsp;</a>
+            <a class='btn btn-mini' ng-hide='log.paused' ng-click='pause(log)'><i class="icon-pause"></i>&nbsp;Pause</a>
+            <a class='btn btn-mini' ng-show='log.paused' ng-click='resume(log)'><i class="icon-play"></i>&nbsp;Resume</a>
+        </div>
+        <div style='max-height:450px;overflow:auto;' divscounter id="{{log.divId}}">
+
+        </div>
+    </div>
+</div>
+
+<div ng-hide="loggedIn" class="container">
+    <!-- Carousel
+    ================================================== -->
+   <br>
+    <h3>
+        Easiest way to monitor Cloud Foundry logs across multiple instances.
+    </h3>
+    <div id="myCarousel" class="carousel slide">
+        <div class="carousel-inner">
+            <div class="item active">
+                <img src="/pics/pic4.png" alt="">
+                <div class="container">
+                    <div class="carousel-caption">
+                        <p class="lead"> Clear, Pause, Resume & Show All</p>
+                        <p >While checking logs, you can 'Clear' existing logs, 'Pause' new logs from showing up , 'Resume' to continue seeing logs
+                            or Press 'Show All' to undo-Clear and see all logs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item ">
+                <img src="/pics/auth1.png" alt="">
+                <div class="container">
+                    <div class="carousel-caption">
+                        <p class="lead" >OAuth 2.0 (Sign In)</p>
+                        <p>Click on 'Sign in with Cloud Foundry' to login via Cloud Foundry's UAA OAuth2 using your cloudfoundry.com credentials</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="/pics/auth2.png" alt="">
+                <div class="container">
+                    <div class="lead carousel-caption">
+                        <p class="lead">Oauth 2.0 (Approve)</p>
+                        <p >If you approve this app, you will be redirected back to this page w/ list of all your apps.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="/pics/pic3.png" alt="">
+                <div class="container">
+                    <div class="carousel-caption">
+                        <p class="lead"> Select an app to see logs</p>
+                        <p >Once logged in, select an app to see its logs. It shows stdout, stderr & staging logs for EACH instance of the app.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="/pics/pic4.png" alt="">
+                <div class="container">
+                    <div class="carousel-caption">
+                        <p class="lead"> Clear, Pause, Resume & Show All</p>
+                        <p >While checking logs, you can 'Clear' existing logs, 'Pause' new logs from showing up , 'Resume' to continue seeing logs
+                        or Press 'Show All' to undo-Clear and see all logs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="/pics/lineNumbers.png" alt="">
+                <div class="container">
+                    <div class="carousel-caption">
+                        <p class="lead"> Toggle line numbers</p>
+                        <p >Add line numbers to log. It will help in sending part of log to others or keeping track last log line number.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+    </div><!-- /.carousel -->
+
+    <hr>
+
+    <footer>
+        <p>&copy; VMware 2012</p>
+    </footer>
+
+</div> <!-- /container -->
+<!-- /container -->
+</body>
+
+</html>

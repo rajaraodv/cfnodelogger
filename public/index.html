@@ -74,6 +74,13 @@
 </div>
 
 <div ng-show="loggedIn"  id="cfLogs" ng-controller='LogsCtrl' class="container">
+    <div ng-hide="currentApp">
+        <br>
+        <div class="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+           <b>Please click on 'Show Logs for:' menu above & select an app to see its logs.</b>
+        </div>
+    </div>
     <div class='well' ng-repeat='log in logs'>
         <div class="alert alert-info" tabindex="1">
 

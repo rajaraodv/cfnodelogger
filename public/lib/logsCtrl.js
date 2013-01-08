@@ -171,7 +171,11 @@ function LogsCtrl($scope, $rootScope) {
      * If the new log data has more lines, then we'll only process the newer ones.
      */
     function processLogData(data, url) {
-        var data = data.trim().split('\n');
+        data = data.trim();
+        if(data == "") {
+            data = "-- no data --";
+        }
+        data = data.split('\n');
 
         var obj = $scope.urlAndLogsHash[url];
         if (!obj) {

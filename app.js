@@ -20,7 +20,7 @@ function generateStateParam() {
 //Set App's credentials
 var CF_CLIENT_ID = '';
 var CF_CLIENT_SECRET = '';
-var CF_CALLBACK_URL = '';
+var CF_CALLBACK_URL = 'https://cfnodelogger.cloudfoundry.com/auth/cloudfoundry/callback';
 
 
 /*
@@ -52,13 +52,13 @@ var cfStrategy = new CloudFoundryStrategy({
     callbackURL: CF_CALLBACK_URL,
     passReqToCallback: true
 }, function (req, accessToken, refreshToken, profile, done) {
-    //  console.log('req.query = ' + JSON.stringify(req.query));
     if (!req.query.state || !states[req.query.state]) {
         console.log("state error! " + req.query.state);
         return done({
             'error': ' state-variable didn\'t match. Possible CSRF?'
         });
     }
+
     //Store accessToken in session
     req.session._cfAccessToken = accessToken;
 
@@ -99,21 +99,13 @@ app.configure(function () {
 
 
 app.get('/', function (req, res) {
-    console.log("in /");
-    console.log("req.user " + JSON.stringify(req.user));
-    if (!req.user || !req.user.user) {
+    if (!req.user || !req.user.email) {
         req.session.destroy();
         req.logout();
         cfStrategy.reset();
         //return res.redirect('/login');
     }
     res.sendfile(__dirname + '/public/index.html');
-});
-
-app.get('/account', ensureAuthenticated, function (req, res) {
-    res.render('account', {
-        user: req.user
-    });
 });
 
 /*
@@ -143,7 +135,6 @@ app.get('/auth/cloudfoundry/callback', passport.authenticate('cloudfoundry', {
 });
 
 app.get('/logout', function (req, res) {
-    console.log("in /logout");
     req.session.destroy();
     req.logout();
     cfStrategy.reset(); //reset auth tokens
@@ -161,7 +152,7 @@ app.get('/me', function (req, res) {
         function (err, response, body) {
             if (!err && response.statusCode == 200) {
                 var apps = JSON.parse(body);
-                res.json({account: {user: req.user.user, apps: apps}});
+                res.json({account: {user: req.user, apps: apps}});
             } else {
                 res.json(response.statusCode, {Error: 'Could not get apps. Not authorized'});
             }

@@ -121,6 +121,10 @@ function LogsCtrl($scope, $rootScope) {
                 return;
             }
             var logDiv = $("#" + logDivId);
+            //If the user has changed the app while the result came back for previous app..
+            if(!logDiv[0]) {
+                return;
+            }
             var currentLines = logDiv.children().length;
             var data = processLogData(data, url);
 
@@ -135,7 +139,9 @@ function LogsCtrl($scope, $rootScope) {
             logDiv.append(data);
 
             //scroll to the bottom of the logs
-            logDiv[0].scrollTop = logDiv[0].scrollHeight;
+            if(logDiv[0]) {
+                logDiv[0].scrollTop = logDiv[0].scrollHeight;
+            }
 
             //Get logs every 5 seconds
             setTimeout(function () {

@@ -38,15 +38,26 @@ function HeaderCtrl($scope, LoginService, $rootScope, $location) {
     }, true);
 
 
-    //Logout from the app
-    $scope.logout = function () {
+    //Logout from the app (and also from CF)
+    $scope.logout = function (alsoFromCF) {
         $rootScope.cfAccount = {};
-        window.location = '/logout';
+        var req = $.ajax({
+            url: '/logout',
+            type: 'get',
+            dataType: 'html'
+        });
+
+        //If true, also logout from CF.com
+        if(alsoFromCF) {
+            req.done(function () {
+                window.location.assign('https://login.cloudfoundry.com/logout.do');
+            });
+        }
     };
 
     //Toggle Show Line number ON/OFF
-    $scope.toggleLN = function() {
-      $rootScope.showLineNumbers =   !$rootScope.showLineNumbers;
+    $scope.toggleLN = function () {
+        $rootScope.showLineNumbers = !$rootScope.showLineNumbers;
     };
 
     //When user chooses an app, set it to currentApp on rootScope.

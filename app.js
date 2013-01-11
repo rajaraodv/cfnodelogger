@@ -18,9 +18,9 @@ function generateStateParam() {
 }
 
 //Set App's credentials
-var CF_CLIENT_ID = '';
-var CF_CLIENT_SECRET = '';
-var CF_CALLBACK_URL = 'https://cfnodelogger.cloudfoundry.com/auth/cloudfoundry/callback';
+var CF_CLIENT_ID = 'CFNodeLogger';
+var CF_CLIENT_SECRET = 'vUspdE9hbcqh';
+var CF_CALLBACK_URL = 'http://localhost:3000/auth/cloudfoundry/callback';
 
 
 /*
@@ -135,6 +135,7 @@ app.get('/auth/cloudfoundry/callback', passport.authenticate('cloudfoundry', {
 });
 
 app.get('/logout', function (req, res) {
+    console.log(' in logout');
     req.session.destroy();
     req.logout();
     cfStrategy.reset(); //reset auth tokens
